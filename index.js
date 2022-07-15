@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb')
+const mongodbAlias = require('./mongodb');
 const http = require('http');
 const express = require('express');
 const data = require('./data');
@@ -7,8 +7,6 @@ const path = require('path');
 const reqFilter = require('./middleware');
 const { traceDeprecation } = require('process');
 
-const url = 'mongodb://localhost:27017'
-const client = new MongoClient(url)
 
 //Get details in process object
 console.log(process.argv);
@@ -42,7 +40,7 @@ http.createServer((req, res) => {
 
 
 //Express JS
-
+const dbConnection = mongodbAlias();
 const app = express();
 const route = express.Router();
 //app.use(reqFilter);
@@ -54,11 +52,17 @@ app.use(express.static(filePath));
 
 route.get('', (req, res) => {
     console.log(req.query);
+
+
     res.send('This is home page');
 })
 
-app.get('/about', (req, res) => {
-    res.send('This is about us page');
+
+app.get('/about', async (req, res) => {
+
+    const collection = await mongodbAlias();
+    let arrColl = await collection.find({}).toArray();
+    res.send(JSON.stringify(arrColl));
 })
 
 app.get('/help', (req, res) => {
@@ -69,12 +73,4 @@ app.use('/', route);
 
 app.listen('4502');
 
-async function getData() {
-    let result = await client.connect();
-    let db = result.db('code-stepby-step')
-    let collection = db.collection('node-tut');
-    let arrColl = await collection.find({}).toArray();
-    console.log(arrColl);
-}
 
-getData();
