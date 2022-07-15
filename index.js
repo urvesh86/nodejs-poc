@@ -2,6 +2,9 @@ const http = require('http');
 const express = require('express');
 const data = require('./data');
 const fs = require('fs');
+const path = require('path');
+const reqFilter = require('./middleware');
+const { traceDeprecation } = require('process');
 
 //Get details in process object
 console.log(process.argv);
@@ -35,8 +38,17 @@ http.createServer((req, res) => {
 
 
 //Express JS
+
 const app = express();
-app.get('', (req, res) => {
+const route = express.Router();
+//app.use(reqFilter);
+route.use(reqFilter);
+
+const filePath = path.join(__dirname, 'public')
+
+app.use(express.static(filePath));
+
+route.get('', (req, res) => {
     console.log(req.query);
     res.send('This is home page');
 })
@@ -48,5 +60,7 @@ app.get('/about', (req, res) => {
 app.get('/help', (req, res) => {
     res.send('This is help page');
 })
+
+app.use('/', route);
 
 app.listen('4502');
