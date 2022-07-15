@@ -1,4 +1,5 @@
 const http = require('http');
+const express = require('express');
 const data = require('./data');
 const fs = require('fs');
 
@@ -31,3 +32,21 @@ http.createServer((req, res) => {
     res.end();
 
 }).listen(4501);
+
+
+//Express JS
+const app = express();
+app.get('', (req, res) => {
+    console.log(req.query);
+    res.send('This is home page');
+})
+
+app.get('/about', (req, res) => {
+    res.send('This is about us page');
+})
+
+app.get('/help', (req, res) => {
+    res.send('This is help page');
+})
+
+app.listen('4502');
